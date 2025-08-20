@@ -16,6 +16,7 @@ Abstract:
 --*/
 
 #include "mlasi.h"
+#include <iostream>
 
 //
 // Define the number of rows from matrix A to transpose to a local buffer.
@@ -1577,12 +1578,15 @@ MlasGemmBatch(
         // TODO: Remove once KAI supports transposing for A
         TransA != CBLAS_TRANSPOSE::CblasTrans &&
         GetMlasPlatform().MlasGemmBatchOverride(TransA, TransB, M, N, K, Data, BatchSize, ThreadPool)){
+        std::cout << "GemmBatch was done using KleidiAI!" << std::endl;
         return;
     }
     //
     // Compute the number of target threads given the complexity of the SGEMM
     // operation. Small requests should run using the single threaded path.
     //
+
+    std::cout << "GemmBatch FELL BACK TO MLAS!" << std::endl;
 
     const double Complexity = double(M) * double(N) * double(K);
 
@@ -1742,9 +1746,11 @@ Return Value:
         // TODO: Remove once KAI supports transposing for A
         TransA != CBLAS_TRANSPOSE::CblasTrans    &&
         GetMlasPlatform().MlasGemmPackBOverride(TransA, TransB, N, K, B, ldb, PackedB)){
-         return;
+            std::cout << "GemmPackB was done using KleidiAI!" << std::endl;
+            return;
     }
 #endif
+    std::cout << "GemmPackB FELL BACK TO MLAS!" << std::endl;
     MLAS_UNREFERENCED_PARAMETER(TransA);
 
 

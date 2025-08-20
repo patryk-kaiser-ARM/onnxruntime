@@ -14,6 +14,8 @@
 #include "kai/ukernels/matmul/pack/kai_rhs_pack_nxk_f32p2vlx1biasf32_f32_f32_sme.h"
 #include "mlasi_kleidiai.h"
 
+#include <iostream>
+
 bool UseSME2 = MLAS_CPUIDINFO::GetCPUIDInfo().HasArm_SME2();
 
 size_t
@@ -120,6 +122,8 @@ Return Value:
     }
 
     if (TransA == CblasNoTrans) {
+        std::cout << "GemmPackB KleidiAI will attempt to run using " << (UseSME2 ? "SME2" : "SME(1)") << std::endl;
+
         const size_t nr = UseSME2 ? kai_get_nr_matmul_clamp_f32_f32p2vlx1_f32p2vlx1biasf32_sme2_mopa()
                                   : kai_get_nr_matmul_clamp_f32_f32p2vlx1_f32p2vlx1b_2vlx2vl_sme_mopa();
         const size_t kr = UseSME2 ? kai_get_kr_matmul_clamp_f32_f32p2vlx1_f32p2vlx1biasf32_sme2_mopa()
@@ -140,6 +144,7 @@ Return Value:
             default:
                 return false;
         }
+        std::cout << "GemmPackB KleidiAI ran successfully using " << (UseSME2 ? "SME2" : "SME(1)") << std::endl;
         return true;
     }
     else{
@@ -230,6 +235,7 @@ Return Value:
         }
         return true;
     }
+    std::cout << "GemmBatch KleidiAI will attempt to run using " << (UseSME2 ? "SME2" : "SME(1)") << std::endl;
 
     const size_t mr = UseSME2 ? kai_get_mr_matmul_clamp_f32_f32p2vlx1_f32p2vlx1biasf32_sme2_mopa()
                               : kai_get_mr_matmul_clamp_f32_f32p2vlx1_f32p2vlx1b_2vlx2vl_sme_mopa();
@@ -377,6 +383,7 @@ Return Value:
             -std::numeric_limits<float>::max(), std::numeric_limits<float>::max()
         );
         }
+        std::cout << "GemmBatch KleidiAI kernel ran successfully using " << (UseSME2 ? "SME2" : "SME(1)" ) << std::endl;
 
         // Final output tile pointer
         float* dst_tile = reinterpret_cast<float*>(CTile);
